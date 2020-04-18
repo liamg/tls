@@ -1,4 +1,4 @@
-# tls-experiments
+# tls
 
 [![Build Status](https://travis-ci.org/liamg/tls.svg "Travis CI status")](https://travis-ci.org/liamg/tls)
 [![GoDoc](https://godoc.org/github.com/liamg/tls?status.svg)](https://godoc.org/github.com/liamg/tls)
