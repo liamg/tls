@@ -1,6 +1,6 @@
 default: test
 
 test:
-	go test -race -v ./...
+	go test -mod=vendor -race -v ./...
 
 .PHONY: default test

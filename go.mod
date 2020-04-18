@@ -1,4 +1,4 @@
-module github.com/liamg/tls-experiments
+module github.com/liamg/tls
 
 go 1.14
 
