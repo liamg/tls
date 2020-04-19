@@ -1,6 +1,9 @@
 package generic
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 type ExtensionType uint16
 
@@ -19,11 +22,33 @@ type Extension interface {
 	Decoder
 }
 
-func ParseExtension(extensionType ExtensionType, data []byte) (Extension, error) {
+func UnpackExtension(reader io.Reader) (Extension, error) {
+
+	typeData := make([]byte, 2)
+	if _, err := reader.Read(typeData); err != nil {
+		return nil, err
+	}
+	extensionType := ExtensionType((uint16(typeData[0]) << 8) + uint16(typeData[1]))
+
+	lengthData := make([]byte, 2)
+	if _, err := reader.Read(lengthData); err != nil {
+		return nil, err
+	}
+	length := (uint16(lengthData[0]) << 8) + uint16(lengthData[1])
+
+	extensionData := make([]byte, length)
+	n, err := reader.Read(extensionData)
+	if err != nil {
+		return nil, err
+	}
+	if n != int(length) {
+		return nil, fmt.Errorf("failed to read full extension data") // TODO better error here
+	}
+
 	switch extensionType {
 	case ExtensionTypeServerName:
 		var serverNameExtension ServerNameExtension
-		err := serverNameExtension.Decode(data)
+		err := serverNameExtension.Decode(extensionData)
 		return &serverNameExtension, err
 	default:
 		return nil, fmt.Errorf("unknown extension type: %X", extensionType)

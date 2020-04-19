@@ -1,6 +1,7 @@
 package v1_2
 
 import (
+	"bytes"
 	"crypto/rand"
 	"fmt"
 	"time"
@@ -150,22 +151,17 @@ func (c *ClientHello) Decode(data []byte) error {
 	extensionLength := (uint16(data[index]) << 8) + uint16(data[index+1])
 	index += 2
 
-	var extensionByteCount uint16
+	reader := bytes.NewReader(data[index:])
+	if reader.Size() != int64(extensionLength) {
+		return fmt.Errorf("unexpected extension length") // TODO better error
+	}
 
-	for extensionByteCount < extensionLength {
-		var extension generic.Extension
-		extensionType := generic.ExtensionType((uint16(data[index]) << 8) + uint16(data[index+1]))
-		index += 2
-		length := (uint16(data[index]) << 8) + uint16(data[index+1])
-		index += 2
-		extensionData := data[index : index+int(length)]
-		extension, err := generic.ParseExtension(extensionType, extensionData)
+	for reader.Len() > 0 {
+		extension, err := generic.UnpackExtension(reader)
 		if err != nil {
 			return err
 		}
 		c.Extensions = append(c.Extensions, extension)
-		extensionByteCount += 4 + length
-		index += int(length)
 	}
 
 	return nil
