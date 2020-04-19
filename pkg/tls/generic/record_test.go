@@ -1,4 +1,4 @@
-package tls
+package generic
 
 import (
 	"crypto/rand"
@@ -26,9 +26,9 @@ func TestRecordEncodingAndDecoding(t *testing.T) {
 	}{
 		{
 			contentType: ContentTypeHandshake,
-			version:     VersionTLS1_2,
+			version:     VersionTLS1_3,
 			fragment:    []byte{9, 8, 7, 6},
-			encoded:     []byte{0x16, 0x03, 0x03, 0x00, 0x04, 0x09, 0x08, 0x07, 0x06},
+			encoded:     []byte{0x16, 0x03, 0x04, 0x00, 0x04, 0x09, 0x08, 0x07, 0x06},
 		},
 		{
 			contentType: ContentTypeAlert,

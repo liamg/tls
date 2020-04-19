@@ -1,4 +1,4 @@
-package tls
+package generic
 
 import (
 	"crypto/rand"
@@ -60,7 +60,7 @@ func TestHandshakeEncodingAndDecoding(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, test.hsType, handshake.Type)
-			assert.Equal(t, test.body, handshake.Body)
+			assert.Equal(t, test.body, handshake.Data)
 		})
 	}
 

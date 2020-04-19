@@ -1,4 +1,4 @@
-package tls
+package generic
 
 type CipherSuite uint16
 

@@ -1,4 +1,4 @@
-package tls
+package generic
 
 type Encoder interface {
 	Encode() ([]byte, error)

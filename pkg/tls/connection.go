@@ -6,13 +6,17 @@ import (
 	"net"
 	"sync"
 	"time"
+
+	"github.com/liamg/tls/pkg/tls/generic"
+
+	v1_2 "github.com/liamg/tls/pkg/tls/v1.2"
 )
 
 var ErrAlreadyConnected = fmt.Errorf("connection is already open")
 var ErrAlreadyClosed = fmt.Errorf("connection is already closed")
 
-var DefaultCipherSuites = []CipherSuite{
-	TLS_AES_128_GCM_SHA256,
+var DefaultCipherSuites = []generic.CipherSuite{
+	generic.TLS_AES_128_GCM_SHA256,
 }
 
 type Connection struct {
@@ -22,8 +26,8 @@ type Connection struct {
 	tcpConn      net.Conn
 	tcpMutex     sync.Mutex
 	isOpen       bool
-	version      Version
-	cipherSuites []CipherSuite
+	version      generic.Version
+	cipherSuites []generic.CipherSuite
 	sessionID    []byte
 }
 
@@ -52,7 +56,7 @@ func NewConnection(host string, options ...Option) (*Connection, error) {
 		host:         host,
 		port:         4483,
 		timeout:      time.Second * 10,
-		version:      VersionTLS1_2,
+		version:      generic.VersionTLS1_3,
 		cipherSuites: DefaultCipherSuites,
 		sessionID:    sessionID,
 	}
@@ -129,17 +133,13 @@ func (conn *Connection) handshake(tcpConn net.Conn) error {
 
 func (conn *Connection) sendClientHello() error {
 
-	random := make([]byte, 32)
-	if _, err := rand.Read(random); err != nil {
-		return err
-	}
-
-	clientHello, err := NewClientHello(
+	clientHello, err := v1_2.NewClientHello(
 		conn.cipherSuites,
-		conn.host,
-		random,
+		time.Now(),
 		conn.sessionID,
+		nil,
 	)
+
 	if err != nil {
 		return err
 	}
@@ -149,14 +149,14 @@ func (conn *Connection) sendClientHello() error {
 		return err
 	}
 
-	clientHelloHandshake := NewHandshake(HandshakeTypeClientHello, clientHelloEncoded)
+	clientHelloHandshake := generic.NewHandshake(generic.HandshakeTypeClientHello, clientHelloEncoded)
 	clientHelloHandshakeEncoded, err := clientHelloHandshake.Encode()
 	if err != nil {
 		return err
 	}
 
-	record := NewRecord(
-		ContentTypeHandshake,
+	record := generic.NewRecord(
+		generic.ContentTypeHandshake,
 		conn.version,
 		clientHelloHandshakeEncoded,
 	)

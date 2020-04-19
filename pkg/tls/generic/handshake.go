@@ -1,6 +1,8 @@
-package tls
+package generic
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type HandshakeType uint8
 
@@ -15,35 +17,37 @@ const (
 	HandshakeTypeCertificateVerify  HandshakeType = 0xf
 	HandshakeTypeClientKeyExchange  HandshakeType = 0x10
 	HandshakeTypeFinished           HandshakeType = 0x14
+	HandshakeTypeCertificateUrl     HandshakeType = 0x15
+	HandshakeTypeCertificateStatus  HandshakeType = 0x16
 )
 
 type Handshake struct {
 	Type HandshakeType
-	Body []byte
+	Data []byte
 }
 
 func NewHandshake(handshakeType HandshakeType, body []byte) Handshake {
 	return Handshake{
 		Type: handshakeType,
-		Body: body,
+		Data: body,
 	}
 }
 
 func (h *Handshake) Encode() ([]byte, error) {
 
-	output := make([]byte, 4+len(h.Body))
+	output := make([]byte, 4+len(h.Data))
 
 	// type
 	output[0] = byte(h.Type)
 
 	// length
-	length := len(h.Body)
+	length := len(h.Data)
 	output[1] = byte(length >> 16)
 	output[2] = byte((length & 0xff00) >> 8)
 	output[3] = byte(length & 0xff)
 
 	// body
-	for i, b := range h.Body {
+	for i, b := range h.Data {
 		output[i+4] = b
 	}
 
@@ -64,7 +68,7 @@ func (h *Handshake) Decode(data []byte) error {
 		return fmt.Errorf("invalid handshake payload, expected %d, got %d", length, len(data)-4)
 	}
 
-	h.Body = data[4:]
+	h.Data = data[4:]
 
 	return nil
 }

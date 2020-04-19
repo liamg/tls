@@ -1,6 +1,8 @@
-package tls
+package generic
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // See https://tools.ietf.org/html/rfc5246#section-6.2.1
 
