@@ -93,7 +93,7 @@ func (c *ClientHello) Encode() ([]byte, error) {
 	output = append(output, 0, 0)
 	var extensionLength int
 	for _, extension := range c.Extensions {
-		extData, err := extension.Encode()
+		extData, err := generic.PackExtension(extension)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode extension: %s", err)
 		}
