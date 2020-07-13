@@ -52,7 +52,7 @@ func (e *ServerNameExtension) Encode() ([]byte, error) {
 func (e *ServerNameExtension) Decode(data []byte) error {
 	length := (uint16(data[0]) << 8) + uint16(data[1])&0xff
 	if len(data) != int(length)+2 {
-		return fmt.Errorf("invalid sesrver name extension length")
+		return fmt.Errorf("invalid server name extension length")
 	}
 
 	index := 2

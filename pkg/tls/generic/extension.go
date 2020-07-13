@@ -14,6 +14,7 @@ const (
 	ExtensionTypeTrustedCAKeys        ExtensionType = 3
 	ExtensionTypeTruncatedHMAC        ExtensionType = 4
 	ExtensionTypeStatusRequest        ExtensionType = 5
+	ExtensionTypeSupportedGroups      ExtensionType = 10
 )
 
 type Extension interface {
@@ -50,6 +51,10 @@ func UnpackExtension(reader io.Reader) (Extension, error) {
 		var serverNameExtension ServerNameExtension
 		err := serverNameExtension.Decode(extensionData)
 		return &serverNameExtension, err
+	case ExtensionTypeSupportedGroups:
+		var supportedGroupsExtension SupportedGroupsExtension
+		err := supportedGroupsExtension.Decode(extensionData)
+		return &supportedGroupsExtension, err
 	default:
 		return nil, fmt.Errorf("unknown extension type: %X", extensionType)
 	}
