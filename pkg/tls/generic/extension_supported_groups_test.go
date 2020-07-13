@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/liamg/tls/pkg/tls/generic"
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
@@ -13,15 +12,15 @@ import (
 func TestSupportedGroupsExtensionEncodingAndDecoding(t *testing.T) {
 
 	tests := []struct {
-		supportedGroups []generic.SupportedGroup
+		supportedGroups []SupportedGroup
 		encoded         []byte
 	}{
 		{
-			supportedGroups: []generic.SupportedGroup{
-				generic.SECP256R1,
-				generic.SECP384R1,
-				generic.X25519,
-				generic.X448,
+			supportedGroups: []SupportedGroup{
+				SECP256R1,
+				SECP384R1,
+				X25519,
+				X448,
 			},
 			encoded: []byte{
 				0x00, 0x8, // length
@@ -36,7 +35,7 @@ func TestSupportedGroupsExtensionEncodingAndDecoding(t *testing.T) {
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("Encode #%d", i), func(t *testing.T) {
 
-			supportedGroupsExtension := generic.NewSupportedGroupsExtension(test.supportedGroups)
+			supportedGroupsExtension := NewSupportedGroupsExtension(test.supportedGroups)
 
 			data, err := supportedGroupsExtension.Encode()
 			require.NoError(t, err)
@@ -45,7 +44,7 @@ func TestSupportedGroupsExtensionEncodingAndDecoding(t *testing.T) {
 
 		t.Run(fmt.Sprintf("Decode #%d", i), func(t *testing.T) {
 
-			var supportedGroupsExtension generic.SupportedGroupsExtension
+			var supportedGroupsExtension SupportedGroupsExtension
 			err := supportedGroupsExtension.Decode(test.encoded)
 			require.NoError(t, err)
 
